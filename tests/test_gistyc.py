@@ -4,6 +4,15 @@ import gistyc
 
 def test_gistyc():
     
-    gistyc.GISTyc(auth_token='abc', file_name='TBD')
+    auth_token = os.environ['gist_token']
+    
+    gist_api = gistyc.GISTyc(auth_token=auth_token)
+    
+    #gist_api.get_gists()
+    
+    #print(len(gist_api.gists))
+    
+    gist_api.create_gist(file_name=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                '_resources/sample.py'))
     
     pass
