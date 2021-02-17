@@ -13,6 +13,9 @@ def test_gistyc():
     #print(len(gist_api.gists))
     
     gist_api.create_gist(file_name=os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                                '_resources/sample.py'))
+                                                '_resources/create/sample.py'))
+
+    gist_api.update_gist(file_name=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                '_resources/update/sample.py'))
     
     pass

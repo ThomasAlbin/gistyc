@@ -52,9 +52,36 @@ class GISTyc:
             
         data = {"public" : True, "files" : gist_code_dict, }
         
-        print(data)
-      #  stop
+
         r = requests.post(_query_url, headers=self._headers, data=json.dumps(data))
+           
+        data = r.json()
+        
+        self.gist_url = data['html_url']
+        self.gist_id = data['id']  
+        
+    def update_gist(self, file_name):
+        
+        _query_url = f'https://api.github.com/gists/{self.gist_id}'
+        
+        file_name = Path(file_name)
+        
+        with open(file_name, 'r') as file_obj:
+            file_content = file_obj.read()
+
+        core_file_name = file_name.name
+        
+        file_content = file_content.split('#%%')
+        
+        gist_code_dict = {}
+        for index, k in enumerate(file_content):
+            gist_code_dict[core_file_name.replace('.py', f'{index}.py')] = {"content": k}
             
-        print(r.json())
+        data = {"public" : True, "files" : gist_code_dict, }
+        
+
+        r = requests.patch(_query_url, headers=self._headers, data=json.dumps(data))
+           
+        data = r.json()
+        
         
