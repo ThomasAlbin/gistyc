@@ -1,5 +1,5 @@
 import os
-
+import time
 import gistyc
 
 def test_gistyc():
@@ -8,14 +8,17 @@ def test_gistyc():
     
     gist_api = gistyc.GISTyc(auth_token=auth_token)
     
-    #gist_api.get_gists()
+   # response_data = gist_api.get_gists()
     
-    #print(len(gist_api.gists))
-    
-    gist_api.create_gist(file_name=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+  #  print(response_data[0])
+   # stop
+    response_data = gist_api.create_gist(file_name=os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                 '_resources/create/sample.py'))
 
-    gist_api.update_gist(file_name=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+    print(response_data)
+    stop
+    response_data = gist_api.update_gist(file_name=os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                 '_resources/update/sample.py'))
+    #print(response_data[0])
+    #response_data = gist_api.delete_gist()
     
-    pass

@@ -7,6 +7,7 @@ A sample example for gistyc
 import time
 
 #%%
+
 # Print the time
 print(time.time())
 

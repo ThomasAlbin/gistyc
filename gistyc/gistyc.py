@@ -3,6 +3,15 @@ from pathlib import Path
 import requests
 import os
 
+class GISTAmbiguityError(Exception):
+
+    def __init__(self, TBD, message="TBD"):
+        self.TBD = TBD
+        super().__init__(self.TBD)
+
+    def __str__(self):
+        return f'TBD'
+
 class GISTyc:
     
     def __init__(self, auth_token):
@@ -11,13 +20,39 @@ class GISTyc:
         
         self._headers = {'Authorization': f'token {auth_token}'}
         
-        self.gists = []
+    
+    @staticmethod
+    def _readnparse_python_file(file_name):    
+    
+        file_name = Path(file_name)
         
+        with open(file_name, 'r') as file_obj:
+            file_content = file_obj.read()
+        
+        core_file_name = file_name.name
+        
+        file_content = file_content.split('#%%')
+        
+        gist_code_dict = {}
+        for index, k in enumerate(file_content):
+            
+            if index==0:            
+                gist_code_dict[core_file_name] = {"content": k}
+                
+            else:
+                gist_code_dict[core_file_name.replace('.py', f'_{index}.py')] = {"content": k}
+            
+        data = {"public" : True, "files" : gist_code_dict, }
+
+        return data    
+
     def get_gists(self):
         
         _query_url = "https://api.github.com/gists?page=PAGE&per_page=100"
         
         _resp_ansr = True
+        
+        data = []
         
         cntr = 0
         while _resp_ansr:
@@ -29,59 +64,60 @@ class GISTyc:
             resp_content = r.json()
             
             if len(resp_content) > 0:
-                self.gists.extend(resp_content)
+                data.extend(resp_content)
             else:
                 _resp_ansr = False
+    
+        return data
+    
     
     def create_gist(self, file_name):
         
         _query_url = "https://api.github.com/gists"
         
-        file_name = Path(file_name)
-        
-        with open(file_name, 'r') as file_obj:
-            file_content = file_obj.read()
-        
-        core_file_name = file_name.name
-        
-        file_content = file_content.split('#%%')
-        
-        gist_code_dict = {}
-        for index, k in enumerate(file_content):
-            gist_code_dict[core_file_name.replace('.py', f'{index}.py')] = {"content": k}
-            
-        data = {"public" : True, "files" : gist_code_dict, }
+        rest_api_data = self._readnparse_python_file(file_name)
         
 
-        r = requests.post(_query_url, headers=self._headers, data=json.dumps(data))
+        r = requests.post(_query_url, headers=self._headers, data=json.dumps(rest_api_data))
            
         data = r.json()
         
-        self.gist_url = data['html_url']
-        self.gist_id = data['id']  
+        return data
         
-    def update_gist(self, file_name):
-        
-        _query_url = f'https://api.github.com/gists/{self.gist_id}'
-        
+    def update_gist(self, file_name, gist_id=None):
+
         file_name = Path(file_name)
-        
-        with open(file_name, 'r') as file_obj:
-            file_content = file_obj.read()
 
-        core_file_name = file_name.name
+        if not gist_id:
+            gist_list = self.get_gists()
+                    
+            for k in gist_list:
+                
+                if file_name.name in k['files']:
+                    
+                    gist_id = k['id']
+                    
+                    break
         
-        file_content = file_content.split('#%%')
+        _query_url = f'https://api.github.com/gists/{gist_id}'
         
-        gist_code_dict = {}
-        for index, k in enumerate(file_content):
-            gist_code_dict[core_file_name.replace('.py', f'{index}.py')] = {"content": k}
-            
-        data = {"public" : True, "files" : gist_code_dict, }
+        rest_api_data = self._readnparse_python_file(file_name)
         
 
-        r = requests.patch(_query_url, headers=self._headers, data=json.dumps(data))
+        r = requests.patch(_query_url, headers=self._headers, data=json.dumps(rest_api_data))
            
         data = r.json()
+        
+        return data
+        
+    def delete_gist(self, gist_id):
+        
+        _query_url = f'https://api.github.com/gists/{gist_id}'
+
+        r = requests.patch(_query_url, headers=self._headers)
+           
+        data = r.json()
+        
+        return data
         
         

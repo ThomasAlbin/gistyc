@@ -7,9 +7,11 @@ An updated sample example for gistyc
 import time
 
 #%%
+
 # Print the time with no changes!
 print(time.time())
 
 #%%
+
 # Replace this random comment block with a hash or current timestamp:
-hash_value = 'Not a Hash at all!'
+HASH_VALUE = 'Not a Hash at all!'
