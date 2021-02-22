@@ -1,16 +1,16 @@
 import json
 from pathlib import Path
 import requests
-import os
 
 class GISTAmbiguityError(Exception):
 
-    def __init__(self, TBD, message="TBD"):
-        self.TBD = TBD
-        super().__init__(self.TBD)
+    def __init__(self, gist_ids_list, message="Number of GIST IDs is too ambiguous"):
+        self.gist_ids_list = gist_ids_list
+        self.message = message
+        super().__init__(self.message)
 
     def __str__(self):
-        return f'TBD'
+        return f'{self.message}\nIDs: ' + ', '.join(self.gist_ids_list)
 
 class GISTyc:
     
@@ -88,16 +88,22 @@ class GISTyc:
 
         file_name = Path(file_name)
 
+
+        gist_ids = []
         if not gist_id:
+
             gist_list = self.get_gists()
                     
             for k in gist_list:
                 
                 if file_name.name in k['files']:
                     
-                    gist_id = k['id']
-                    
-                    break
+                    gist_ids.append(k['id'])
+
+            gist_id = gist_ids[0]
+
+        if len(gist_ids) > 1:
+            raise(GISTAmbiguityError(gist_ids_list=gist_ids))
         
         _query_url = f'https://api.github.com/gists/{gist_id}'
         
@@ -114,9 +120,9 @@ class GISTyc:
         
         _query_url = f'https://api.github.com/gists/{gist_id}'
 
-        r = requests.patch(_query_url, headers=self._headers)
+        r = requests.delete(_query_url, headers=self._headers)
            
-        data = r.json()
+        data = r.status_code
         
         return data
         

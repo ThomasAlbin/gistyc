@@ -1,1 +1,1 @@
-from gistyc.gistyc import GISTyc
+from gistyc.gistyc import GISTyc, GISTAmbiguityError
