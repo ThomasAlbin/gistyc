@@ -9,15 +9,14 @@ import requests
 class GISTAmbiguityError(Exception):
     """TBW"""
     def __init__(self, gist_ids_list, message="Number of GIST IDs is too ambiguous"):
-        """
-        TBW
+        """Initiate the Exception class
 
         Parameters
         ----------
-        gist_ids_list : TYPE
-            DESCRIPTION.
-        message : TYPE, optional
-            DESCRIPTION. The default is "Number of GIST IDs is too ambiguous".
+        gist_ids_list : list
+            List of strings with GIST IDs.
+        message : str, optional
+            Default exception message. The default is "Number of GIST IDs is too ambiguous".
 
         Returns
         -------
@@ -34,21 +33,45 @@ class GISTAmbiguityError(Exception):
 
 
     def __str__(self):
-        """
-        TBW
+        """Modifying the message function
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        str
+            Exception message.
 
         """
+
         return f'{self.message}\nIDs: ' + ', '.join(self.gist_ids_list)
 
 
 class GISTyc:
+    """This class is used to access the GitHub GIST REST API functions to create, update and delete
+    GISTs.
+
+    The advantage of this class and its corresponding methods is the capability to update
+    e.g., already existing GISTs (with multiple files) that are e.g., embedded in an online
+    tutorial. Updateing GISTs automatically is useful if the GISTs corresponding online
+    documentation is not valid anymore. Updating GISTs manually is tedious and erorr-prone.
+    However, integrating GISTyc in a CI/CD pipeline (via GitHub Actions) may improve the
+    maintainability of already exisiting GIST codes.
+
+    """
+
 
     def __init__(self, auth_token):
+        """Initiate the GISTys class with the GitHub GIST REST API token
+
+        Parameters
+        ----------
+        auth_token : str
+            Authentication token of the GitHub GIST REST API.
+
+        Returns
+        -------
+        None.
+
+        """
 
         # Set the authentication token
         self.auth_token = auth_token
@@ -59,6 +82,20 @@ class GISTyc:
 
     @staticmethod
     def _readnparse_python_file(file_name):
+        """Helper function within the class to read a Python file and return a REST API - ready
+        body.
+
+        Parameters
+        ----------
+        file_name : pathlib.Path or str
+            Absolute or relative path name of the file to read.
+
+        Returns
+        -------
+        data : dict
+            Body for the REST API call.
+
+        """
 
         # Set the filename as a Path
         file_name = Path(file_name)
@@ -96,7 +133,14 @@ class GISTyc:
 
 
     def get_gists(self):
+        """TBW
 
+        Returns
+        -------
+        resp_data : TYPE
+            DESCRIPTION.
+
+        """
 
         # Set the REST API url to obtain the list of GISTs. PAGE will be replace later in a loop.
         # Per page: a max. value of 100 GISTs is requested
@@ -129,6 +173,19 @@ class GISTyc:
 
 
     def create_gist(self, file_name):
+        """TBW
+
+        Parameters
+        ----------
+        file_name : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        resp_data : TYPE
+            DESCRIPTION.
+
+        """
 
         # Set the REST API url for creating a GIST
         _query_url = "https://api.github.com/gists"
@@ -144,6 +201,28 @@ class GISTyc:
 
 
     def update_gist(self, file_name, gist_id=None):
+        """TBW
+
+        Parameters
+        ----------
+        file_name : TYPE
+            DESCRIPTION.
+        gist_id : TYPE, optional
+            DESCRIPTION. The default is None.
+
+        Raises
+        ------
+        an
+            DESCRIPTION.
+        GISTAmbiguityError
+            DESCRIPTION.
+
+        Returns
+        -------
+        resp_data : TYPE
+            DESCRIPTION.
+
+        """
 
         # Iterate trough all gists and append all IDs that contain the file name (if requested!)
         gist_ids = []
@@ -183,7 +262,19 @@ class GISTyc:
 
 
     def delete_gist(self, gist_id):
+        """TBW
 
+        Parameters
+        ----------
+        gist_id : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        resp_status : TYPE
+            DESCRIPTION.
+
+        """
         # Set the REST API url for deleting a GIST
         _query_url = f'https://api.github.com/gists/{gist_id}'
 
