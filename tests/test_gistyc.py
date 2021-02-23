@@ -1,5 +1,4 @@
-"""Testing suite for the gistyc functionalities.
-"""
+"""Testing suite for the gistyc functionalities."""
 
 # Import standard libraries
 import os
