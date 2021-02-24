@@ -109,7 +109,7 @@ class GISTyc:
 
         # Split the python file content at the cell separator "#%%". The resulting list contains
         # the code blocks as individual array elements
-        file_content = file_content.split('#%%')
+        file_content = file_content.split('#%%\n')
 
         # The python code (blocks) must be put into a dictionary that is later used as a JSON
         # in the request REST API body
