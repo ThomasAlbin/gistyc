@@ -133,12 +133,12 @@ class GISTyc:
 
 
     def get_gists(self):
-        """TBW
+        """Get all GISTs information (ID, url, meta information, etc.)
 
         Returns
         -------
-        resp_data : TYPE
-            DESCRIPTION.
+        resp_data : list
+            List of GISTs. Each GIST is a dictionary with miscellaneous data and meta data.
 
         """
 
@@ -173,17 +173,18 @@ class GISTyc:
 
 
     def create_gist(self, file_name):
-        """TBW
+        """Create a GISTs from a given file. Use "#%%" as a block separator to create sub-GISTs /
+        files from a single input file
 
         Parameters
         ----------
-        file_name : TYPE
-            DESCRIPTION.
+        file_name : pathlib.Path or str
+            Absolute or relative path name of the file to read.
 
         Returns
         -------
-        resp_data : TYPE
-            DESCRIPTION.
+        resp_data : dict
+            GIST REST API response.
 
         """
 
@@ -201,28 +202,32 @@ class GISTyc:
 
 
     def update_gist(self, file_name, gist_id=None):
-        """TBW
+        """Update a GISTs based on its file name or GIST ID. If the file name is provided it is
+        assumed that only one GIST corresponds to the input's file name.
 
         Parameters
         ----------
-        file_name : TYPE
-            DESCRIPTION.
-        gist_id : TYPE, optional
-            DESCRIPTION. The default is None.
+        file_name : pathlib.Path or str
+            Absolute or relative path name of the file to read.
+        gist_id : str, optional
+            GIST ID that is needed if the file name appears more than once in the GIST repository.
+            The default is None.
 
         Raises
         ------
-        an
-            DESCRIPTION.
         GISTAmbiguityError
-            DESCRIPTION.
+            If several GISTs have the same file name, but no GIST ID is provided as an input this
+            exception is raised.
 
         Returns
         -------
-        resp_data : TYPE
-            DESCRIPTION.
+        resp_data : dict
+            GIST REST API response.
 
         """
+
+        # Convert the file name to pathlib.Path
+        file_name = Path(file_name)
 
         # Iterate trough all gists and append all IDs that contain the file name (if requested!)
         gist_ids = []
@@ -262,19 +267,20 @@ class GISTyc:
 
 
     def delete_gist(self, gist_id):
-        """TBW
+        """Delete a GIST based on its GIST ID.
 
         Parameters
         ----------
-        gist_id : TYPE
-            DESCRIPTION.
+        gist_id : str
+            GIST ID to delete.
 
         Returns
         -------
-        resp_status : TYPE
-            DESCRIPTION.
+        resp_status : int
+            HTTP response code. A successful deletion shall return 204.
 
         """
+
         # Set the REST API url for deleting a GIST
         _query_url = f'https://api.github.com/gists/{gist_id}'
 
