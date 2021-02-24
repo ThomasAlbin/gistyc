@@ -10,12 +10,11 @@ from . import GISTyc
 @click.option('-t', '--auth-token', help='GIST REST API token')
 
 @click.option('-f', '--file-name', help='Absolute or relative file name path')
-@click.option('-id', '--gist-id', help='GIST ID')
+@click.option('-id', '--gist-id', default=None, help='GIST ID')
 
 def run(create, update, delete, auth_token, file_name, gist_id):
 
     gist_api = GISTyc(auth_token=auth_token)
-    
 
     if create:
 
@@ -24,8 +23,10 @@ def run(create, update, delete, auth_token, file_name, gist_id):
 
     elif update:
         
-        response_data = gist_api.update_gist(file_name=file_name)
-
+        if not gist_id:
+            response_data = gist_api.update_gist(file_name=file_name)
+        else:
+            response_data = gist_api.update_gist(file_name=file_name, gist_id=gist_id)
 
     elif delete:
     
