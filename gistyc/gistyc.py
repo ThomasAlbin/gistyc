@@ -7,7 +7,7 @@ import requests
 
 
 class GISTAmbiguityError(Exception):
-    """TBW"""
+    """Exception for multiple GIST filename updates"""
     def __init__(self, gist_ids_list, message="Number of GIST IDs is too ambiguous"):
         """Initiate the Exception class
 
