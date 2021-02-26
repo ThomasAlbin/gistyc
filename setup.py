@@ -1,0 +1,1 @@
+# Always prefer setuptools over distutilsfrom setuptools import setupsetup(package_data={"gistyc": ["py.typed"]})
