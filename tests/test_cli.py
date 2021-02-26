@@ -24,8 +24,8 @@ USAMPLE_FILE_PATH = os.path.join(CORE_PATH, '_resources/update', USAMPLE_FILE_NA
 AUTH_TOKEN = os.environ['gist_token']
 
 
-def test_cli_create_n_delete():
-    """Testing the creation and deletion of a GIST.
+def test_cli_create_n_delete_id():
+    """Testing the creation and deletion of a GIST, based on the ID.
 
     Returns
     -------
@@ -59,6 +59,44 @@ def test_cli_create_n_delete():
 
     # Check the HTTP status code
     assert '204' in dresult.output
+
+
+def test_cli_create_n_delete():
+    """Testing the creation and deletion of a GIST, based on the file name.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    # Set up the CLI Runner and execute the create command
+    runner = CliRunner()
+    cresult = runner.invoke(gistyc.cli.run, ['--create',
+                                             '--auth-token', AUTH_TOKEN,
+                                             '--file-name', CSAMPLE_FILE_PATH])
+
+    # Check if the CLI ran error free
+    assert cresult.exit_code == 0
+
+    # Convert the response to JSON by identifying the format automatically
+    cresult_data = ast.literal_eval(cresult.output)
+
+    # Check if the file name is in the GIST REST API response
+    assert CSAMPLE_FILE_NAME in cresult_data['files'].keys()
+
+    # Set up the CLI Runner and execute the delete command
+    runner = CliRunner()
+    dresult = runner.invoke(gistyc.cli.run, ['--delete',
+                                             '--auth-token', AUTH_TOKEN,
+                                             '--file-name', CSAMPLE_FILE_PATH])
+
+    # Check if the CLI ran error free
+    assert dresult.exit_code == 0
+
+    # Check the HTTP status code
+    assert '204' in dresult.output
+
 
 def test_cli_create_n_update_file():
     """Testing the creation and update of a GIST (based on the pure file name).

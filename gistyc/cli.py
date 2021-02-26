@@ -65,8 +65,13 @@ def run(create, update, delete, auth_token, file_name, gist_id):
     # Delete GIST routine
     elif delete:
 
-        # Create a GIST with the sample file
-        response_data = gist_api.delete_gist(gist_id=gist_id)
+        # If not GIST ID is provided: use only the file name
+        if not gist_id:
+            response_data = gist_api.delete_gist(file_name=file_name)
+
+        # Else, use the GIST ID
+        else:
+            response_data = gist_api.delete_gist(gist_id=gist_id)
 
     # Echo the resposen back to the terminal
     click.echo(str(response_data))

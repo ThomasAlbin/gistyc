@@ -23,9 +23,9 @@ USAMPLE_FILE_PATH = os.path.join(CORE_PATH, '_resources/update', USAMPLE_FILE_NA
 AUTH_TOKEN = os.environ['gist_token']
 
 
-def test_gistyc_create_n_delete():
+def test_gistyc_create_n_delete_id():
     """
-    Testing the creation and deletion of a GIST.
+    Testing the creation and deletion of a GIST by a GIST ID.
 
     Returns
     -------
@@ -43,7 +43,31 @@ def test_gistyc_create_n_delete():
     assert 'sample.py' in response_data['files'].keys()
 
     # Delete the GIST, based on the reponse's ID and check for the status code 204
-    response_data = gist_api.delete_gist(response_data['id'])
+    response_data = gist_api.delete_gist(gist_id=response_data['id'])
+    assert response_data == 204
+
+
+def test_gistyc_create_n_delete_filename():
+    """
+    Testing the creation and deletion of a GIST by the file name.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    # Initiate the GISTyc class with the auth token
+    gist_api = gistyc.GISTyc(auth_token=AUTH_TOKEN)
+
+    # Create a GIST with the sample file
+    response_data = gist_api.create_gist(file_name=USAMPLE_FILE_PATH)
+
+    # Check whether the creation was successful by considering the response from GitHub
+    assert 'sample.py' in response_data['files'].keys()
+
+    # Delete the GIST, based on the reponse's ID and check for the status code 204
+    response_data = gist_api.delete_gist(file_name='sample.py')
     assert response_data == 204
 
 
@@ -75,7 +99,7 @@ def test_gistyc_create_n_update():
     assert response_update_data['updated_at'] > response_update_data['created_at']
 
     # Delete the GIST, based on the reponse's ID and check for the status code 204
-    response_data = gist_api.delete_gist(response_update_data['id'])
+    response_data = gist_api.delete_gist(gist_id=response_update_data['id'])
     assert response_data == 204
 
 
@@ -107,7 +131,7 @@ def test_gistyc_create_n_update_id():
     assert response_update_data['updated_at'] > response_update_data['created_at']
 
     # Delete the GIST, based on the reponse's ID and check for the status code 204
-    response_data = gist_api.delete_gist(response_update_data['id'])
+    response_data = gist_api.delete_gist(gist_id=response_update_data['id'])
     assert response_data == 204
 
 

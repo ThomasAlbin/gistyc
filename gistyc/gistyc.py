@@ -81,7 +81,7 @@ class GISTyc:
 
 
     @staticmethod
-    def _readnparse_python_file(file_name):
+    def _readnparse_python_file(file_name, sep='#%%'):
         """Helper function within the class to read a Python file and return a REST API - ready
         body.
 
@@ -89,6 +89,8 @@ class GISTyc:
         ----------
         file_name : pathlib.Path or str
             Absolute or relative path name of the file to read.
+        sep : str
+            Python code block separator. Default is '#%%'
 
         Returns
         -------
@@ -109,7 +111,7 @@ class GISTyc:
 
         # Split the python file content at the cell separator "#%%". The resulting list contains
         # the code blocks as individual array elements
-        file_content = file_content.split('#%%\n')
+        file_content = file_content.split(f'{sep}\n')
 
         # The python code (blocks) must be put into a dictionary that is later used as a JSON
         # in the request REST API body
@@ -130,6 +132,58 @@ class GISTyc:
         data = {"public" : True, "files" : gist_code_dict, }
 
         return data
+
+    def get_gist_id(self, file_name=None, gist_id=None):
+        """
+        TBW
+
+        Parameters
+        ----------
+        file_name : TYPE
+            DESCRIPTION.
+        gist_id : TYPE
+            DESCRIPTION.
+
+        Raises
+        ------
+        GISTAmbiguityError
+            DESCRIPTION.
+
+        Returns
+        -------
+        gist_id : TYPE
+            DESCRIPTION.
+
+        """
+
+        # Set a placeholder for the GIST IDs
+        gist_ids = []
+
+        # If the gist id is empty, search for it based on the file name. Otherwise, return the
+        # gist id
+        if not gist_id:
+
+            # Get all GISTs
+            gist_list = self.get_gists()
+
+            # Iterate trough all GISTs
+            for _gist in gist_list:
+
+                # Check if the file name is present in the GIST
+                if file_name.name in _gist['files']:
+
+                    # Append the corresponding GIST
+                    gist_ids.append(_gist['id'])
+
+            # Take only the first entry as the GIST ID of interest. There should only be 1 ID
+            # present
+            gist_id = gist_ids[0]
+
+        # If more than 1 GIST ID is present: raise an exception
+        if len(gist_ids) > 1:
+            raise GISTAmbiguityError(gist_ids_list=gist_ids)
+
+        return gist_id
 
 
     def get_gists(self):
@@ -172,14 +226,16 @@ class GISTyc:
         return resp_data
 
 
-    def create_gist(self, file_name):
+    def create_gist(self, file_name, sep='#%%'):
         """Create a GISTs from a given file. Use "#%%" as a block separator to create sub-GISTs /
-        files from a single input file
+        files from a single input file as default. Otherwise, please specify!
 
         Parameters
         ----------
         file_name : pathlib.Path or str
             Absolute or relative path name of the file to read.
+        sep : str
+            Python code block separator. Default is '#%%'
 
         Returns
         -------
@@ -192,7 +248,7 @@ class GISTyc:
         _query_url = "https://api.github.com/gists"
 
         # Read the file and return the body for the REST API call
-        rest_api_data = self._readnparse_python_file(file_name)
+        rest_api_data = self._readnparse_python_file(file_name, sep=sep)
 
         # Call the REST API and obtain the response
         resp = requests.post(_query_url, headers=self._headers, data=json.dumps(rest_api_data))
@@ -213,12 +269,6 @@ class GISTyc:
             GIST ID that is needed if the file name appears more than once in the GIST repository.
             The default is None.
 
-        Raises
-        ------
-        GISTAmbiguityError
-            If several GISTs have the same file name, but no GIST ID is provided as an input this
-            exception is raised.
-
         Returns
         -------
         resp_data : dict
@@ -229,29 +279,8 @@ class GISTyc:
         # Convert the file name to pathlib.Path
         file_name = Path(file_name)
 
-        # Iterate trough all gists and append all IDs that contain the file name (if requested!)
-        gist_ids = []
-        if not gist_id:
-
-            # Get all GISTs
-            gist_list = self.get_gists()
-
-            # Iterate trough all GISTs
-            for _gist in gist_list:
-
-                # Check if the file name is present in the GIST
-                if file_name.name in _gist['files']:
-
-                    # Append the corresponding GIST
-                    gist_ids.append(_gist['id'])
-
-            # Take only the first entry as the GIST ID of interest. There should only be 1 ID
-            # present
-            gist_id = gist_ids[0]
-
-        # If more than 1 GIST ID is present: raise an exception
-        if len(gist_ids) > 1:
-            raise GISTAmbiguityError(gist_ids_list=gist_ids)
+        # Get the GIST ID
+        gist_id = self.get_gist_id(file_name=file_name, gist_id=gist_id)
 
         # Set the REST API url to update a GIST
         _query_url = f'https://api.github.com/gists/{gist_id}'
@@ -266,13 +295,15 @@ class GISTyc:
         return resp_data
 
 
-    def delete_gist(self, gist_id):
-        """Delete a GIST based on its GIST ID.
+    def delete_gist(self, file_name=None, gist_id=None):
+        """Delete a GIST based on its GIST ID or file name. One input parameter MUST be provided.
 
         Parameters
         ----------
-        gist_id : str
-            GIST ID to delete.
+        file_name : pathlib.Path or str, optional
+            File name of the corresponding GIST to be deleted. The default is None.
+        gist_id : str, optional
+            GIST ID to delete. The default is None
 
         Returns
         -------
@@ -280,6 +311,11 @@ class GISTyc:
             HTTP response code. A successful deletion shall return 204.
 
         """
+
+        # If a file name is present, search for the GIST ID of the corresponding GIST
+        if file_name:
+            file_name = Path(file_name)
+            gist_id = self.get_gist_id(file_name=file_name, gist_id=gist_id)
 
         # Set the REST API url for deleting a GIST
         _query_url = f'https://api.github.com/gists/{gist_id}'
