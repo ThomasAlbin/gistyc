@@ -22,7 +22,7 @@ def run(create: bool,
         file_name: str,
         gist_id: str) -> None:
     """CLI routine to call the GISTyc API to create, update and delete a GIST.
-    
+
     All public functions echo the response back to the terminal.
 
     Parameters
