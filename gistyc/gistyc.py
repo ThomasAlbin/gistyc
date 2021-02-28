@@ -11,8 +11,9 @@ import requests
 class GISTAmbiguityError(Exception):
     """Exception for multiple GIST filename updates."""
 
-    def __init__(self, gist_ids_list: t.List[str],
-                 message: str = "Number of GIST IDs is too ambiguous") -> None:
+    def __init__(
+        self, gist_ids_list: t.List[str], message: str = "Number of GIST IDs is too ambiguous"
+    ) -> None:
         """Initiate the Exception class.
 
         Parameters
@@ -43,7 +44,7 @@ class GISTAmbiguityError(Exception):
             Exception message.
 
         """
-        return f'{self.message}\nIDs: ' + ', '.join(self.gist_ids_list)
+        return f"{self.message}\nIDs: " + ", ".join(self.gist_ids_list)
 
 
 class GISTyc:
@@ -75,11 +76,12 @@ class GISTyc:
         self.auth_token = auth_token
 
         # Set the default header for the REST API
-        self._headers = {'Authorization': f'token {auth_token}'}
+        self._headers = {"Authorization": f"token {auth_token}"}
 
     @staticmethod
-    def _readnparse_python_file(file_name: t.Union[Path, str],
-                                sep: str = '#%%') -> t.Dict[t.Any, t.Any]:
+    def _readnparse_python_file(
+        file_name: t.Union[Path, str], sep: str = "#%%"
+    ) -> t.Dict[t.Any, t.Any]:
         """Read a Python file and returns a REST API - ready body.
 
         Parameters
@@ -99,7 +101,7 @@ class GISTyc:
         file_name = Path(file_name)
 
         # Open the file and read the content. The entire content is stored in a single string.
-        with open(file_name, 'r') as file_obj:
+        with open(file_name, "r") as file_obj:
             file_content = file_obj.read()
 
         # Get the file name without the path
@@ -107,7 +109,7 @@ class GISTyc:
 
         # Split the python file content at the cell separator "#%%". The resulting list contains
         # the code blocks as individual array elements
-        file_content_list = file_content.split(f'{sep}\n')
+        file_content_list = file_content.split(f"{sep}\n")
 
         # The python code (blocks) must be put into a dictionary that is later used as a JSON
         # in the request REST API body
@@ -122,15 +124,19 @@ class GISTyc:
 
             # ... all other GIST file names get a consecutive, index depending number as a suffix
             else:
-                gist_code_dict[core_file_name.replace('.py', f'_{index}.py')] = {"content": k}
+                gist_code_dict[core_file_name.replace(".py", f"_{index}.py")] = {"content": k}
 
         # Put the content in a dictionary for the REST API
-        data = {"public": True, "files": gist_code_dict, }
+        data = {
+            "public": True,
+            "files": gist_code_dict,
+        }
 
         return data
 
-    def _get_gist_id(self, file_name: t.Optional[Path] = None,
-                     gist_id: t.Optional[str] = None) -> str:
+    def _get_gist_id(
+        self, file_name: t.Optional[Path] = None, gist_id: t.Optional[str] = None
+    ) -> str:
         """
         Get the GIST ID of a given file name (if applicable). Otherwise return the input GIST ID.
 
@@ -169,10 +175,10 @@ class GISTyc:
             for _gist in gist_list:
 
                 # Check if the file name is present in the GIST
-                if file_name.name in _gist['files']:
+                if file_name.name in _gist["files"]:
 
                     # Append the corresponding GIST
-                    gist_ids.append(_gist['id'])
+                    gist_ids.append(_gist["id"])
 
             # If more than 1 GIST ID is present: raise an exception
             if len(gist_ids) > 1:
@@ -209,7 +215,7 @@ class GISTyc:
             cntr += 1
 
             # Get the GISTs for a particular page
-            resp = requests.get(_query_url.replace('PAGE', str(cntr)), headers=self._headers)
+            resp = requests.get(_query_url.replace("PAGE", str(cntr)), headers=self._headers)
             resp_content = resp.json()
 
             # If the response is not empty, obtain the results and extend the placeholder array
@@ -222,7 +228,7 @@ class GISTyc:
 
         return resp_data
 
-    def create_gist(self, file_name: t.Union[Path, str], sep: str = '#%%') -> t.List:
+    def create_gist(self, file_name: t.Union[Path, str], sep: str = "#%%") -> t.List:
         """Create a GISTs from a given file.
 
         Use "#%%" as a block separator to create sub-GISTs / files from a single input file as
@@ -253,8 +259,7 @@ class GISTyc:
 
         return resp_data
 
-    def update_gist(self, file_name: t.Union[Path, str],
-                    gist_id: t.Optional[str] = None) -> t.List:
+    def update_gist(self, file_name: t.Union[Path, str], gist_id: t.Optional[str] = None) -> t.List:
         """Update a GISTs based on its file name or GIST ID.
 
         If the file name is provided it is assumed that only one GIST corresponds to the input's
@@ -281,7 +286,7 @@ class GISTyc:
         gist_id = self._get_gist_id(file_name=file_name, gist_id=gist_id)
 
         # Set the REST API url to update a GIST
-        _query_url = f'https://api.github.com/gists/{gist_id}'
+        _query_url = f"https://api.github.com/gists/{gist_id}"
 
         # Read and parse the file
         rest_api_data = self._readnparse_python_file(file_name)
@@ -292,8 +297,9 @@ class GISTyc:
 
         return resp_data
 
-    def delete_gist(self, file_name: t.Optional[t.Union[Path, str]] = None,
-                    gist_id: t.Optional[str] = None) -> int:
+    def delete_gist(
+        self, file_name: t.Optional[t.Union[Path, str]] = None, gist_id: t.Optional[str] = None
+    ) -> int:
         """Delete a GIST based on its GIST ID or file name. One input parameter MUST be provided.
 
         Parameters
@@ -315,7 +321,7 @@ class GISTyc:
             gist_id = self._get_gist_id(file_name=file_name, gist_id=gist_id)
 
         # Set the REST API url for deleting a GIST
-        _query_url = f'https://api.github.com/gists/{gist_id}'
+        _query_url = f"https://api.github.com/gists/{gist_id}"
 
         # Delete the GIST and get the status code from the response
         resp = requests.delete(_query_url, headers=self._headers)
