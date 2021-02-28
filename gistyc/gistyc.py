@@ -3,12 +3,14 @@
 # Import standard libraries
 import json
 from pathlib import Path
-import requests
+import typing as t
 
+import requests
 
 class GISTAmbiguityError(Exception):
     """Exception for multiple GIST filename updates"""
-    def __init__(self, gist_ids_list, message="Number of GIST IDs is too ambiguous"):
+    def __init__(self, gist_ids_list: t.List[str],
+                 message: str = "Number of GIST IDs is too ambiguous") -> None:
         """Initiate the Exception class
 
         Parameters
@@ -32,7 +34,7 @@ class GISTAmbiguityError(Exception):
         super().__init__(self.message)
 
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Modifying the message function
 
         Returns
@@ -59,7 +61,7 @@ class GISTyc:
     """
 
 
-    def __init__(self, auth_token):
+    def __init__(self, auth_token: str) -> None:
         """Initiate the GISTys class with the GitHub GIST REST API token
 
         Parameters
@@ -81,7 +83,8 @@ class GISTyc:
 
 
     @staticmethod
-    def _readnparse_python_file(file_name, sep='#%%'):
+    def _readnparse_python_file(file_name: t.Union[Path, str],
+                                sep: str = '#%%') -> t.Dict[t.Any, t.Any]:
         """Helper function within the class to read a Python file and return a REST API - ready
         body.
 
@@ -111,14 +114,14 @@ class GISTyc:
 
         # Split the python file content at the cell separator "#%%". The resulting list contains
         # the code blocks as individual array elements
-        file_content = file_content.split(f'{sep}\n')
+        file_content_list = file_content.split(f'{sep}\n')
 
         # The python code (blocks) must be put into a dictionary that is later used as a JSON
         # in the request REST API body
         gist_code_dict = {}
 
         # Iterate through the list of code blocks
-        for index, k in enumerate(file_content):
+        for index, k in enumerate(file_content_list):
 
             # At the first index, simply add the content with the original file name ...
             if index == 0:
@@ -133,35 +136,40 @@ class GISTyc:
 
         return data
 
-    def get_gist_id(self, file_name=None, gist_id=None):
+    def _get_gist_id(self, file_name: t.Optional[Path] = None,
+                     gist_id: t.Optional[str] = None) -> str:
         """
-        TBW
+        Get the GIST ID of a given file name (if applicable). Otherwise return the input GIST ID.
 
         Parameters
         ----------
-        file_name : TYPE
-            DESCRIPTION.
-        gist_id : TYPE
-            DESCRIPTION.
+        file_name : pathlib.Path
+            File name path.
+        gist_id : str
+            GIST ID.
 
         Raises
         ------
         GISTAmbiguityError
-            DESCRIPTION.
+            Exception raised if a file name has more than 1 GIST IDs.
 
         Returns
         -------
-        gist_id : TYPE
-            DESCRIPTION.
+        gist_id_ret : str
+            file name correpsonding GIST ID (or input GIST ID).
 
         """
 
-        # Set a placeholder for the GIST IDs
-        gist_ids = []
+        if isinstance(gist_id, str):
+            gist_id_ret = gist_id
+
 
         # If the gist id is empty, search for it based on the file name. Otherwise, return the
         # gist id
-        if not gist_id:
+        elif isinstance(file_name, Path):
+
+            # Set a placeholder for the GIST IDs
+            gist_ids = []
 
             # Get all GISTs
             gist_list = self.get_gists()
@@ -175,18 +183,18 @@ class GISTyc:
                     # Append the corresponding GIST
                     gist_ids.append(_gist['id'])
 
+            # If more than 1 GIST ID is present: raise an exception
+            if len(gist_ids) > 1:
+                raise GISTAmbiguityError(gist_ids_list=gist_ids)
+
             # Take only the first entry as the GIST ID of interest. There should only be 1 ID
             # present
-            gist_id = gist_ids[0]
+            gist_id_ret = gist_ids[0]
 
-        # If more than 1 GIST ID is present: raise an exception
-        if len(gist_ids) > 1:
-            raise GISTAmbiguityError(gist_ids_list=gist_ids)
-
-        return gist_id
+        return gist_id_ret
 
 
-    def get_gists(self):
+    def get_gists(self) -> t.List[t.Dict]:
         """Get all GISTs information (ID, url, meta information, etc.)
 
         Returns
@@ -226,7 +234,7 @@ class GISTyc:
         return resp_data
 
 
-    def create_gist(self, file_name, sep='#%%'):
+    def create_gist(self, file_name: t.Union[Path, str], sep: str = '#%%') -> t.List:
         """Create a GISTs from a given file. Use "#%%" as a block separator to create sub-GISTs /
         files from a single input file as default. Otherwise, please specify!
 
@@ -257,7 +265,8 @@ class GISTyc:
         return resp_data
 
 
-    def update_gist(self, file_name, gist_id=None):
+    def update_gist(self, file_name: t.Union[Path, str],
+                    gist_id: t.Optional[str] = None) -> t.List:
         """Update a GISTs based on its file name or GIST ID. If the file name is provided it is
         assumed that only one GIST corresponds to the input's file name.
 
@@ -280,7 +289,7 @@ class GISTyc:
         file_name = Path(file_name)
 
         # Get the GIST ID
-        gist_id = self.get_gist_id(file_name=file_name, gist_id=gist_id)
+        gist_id = self._get_gist_id(file_name=file_name, gist_id=gist_id)
 
         # Set the REST API url to update a GIST
         _query_url = f'https://api.github.com/gists/{gist_id}'
@@ -295,7 +304,8 @@ class GISTyc:
         return resp_data
 
 
-    def delete_gist(self, file_name=None, gist_id=None):
+    def delete_gist(self, file_name: t.Optional[t.Union[Path, str]] = None,
+                    gist_id: t.Optional[str] = None) -> int:
         """Delete a GIST based on its GIST ID or file name. One input parameter MUST be provided.
 
         Parameters
@@ -315,7 +325,7 @@ class GISTyc:
         # If a file name is present, search for the GIST ID of the corresponding GIST
         if file_name:
             file_name = Path(file_name)
-            gist_id = self.get_gist_id(file_name=file_name, gist_id=gist_id)
+            gist_id = self._get_gist_id(file_name=file_name, gist_id=gist_id)
 
         # Set the REST API url for deleting a GIST
         _query_url = f'https://api.github.com/gists/{gist_id}'
