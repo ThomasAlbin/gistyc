@@ -7,11 +7,13 @@ import typing as t
 
 import requests
 
+
 class GISTAmbiguityError(Exception):
-    """Exception for multiple GIST filename updates"""
+    """Exception for multiple GIST filename updates."""
+
     def __init__(self, gist_ids_list: t.List[str],
                  message: str = "Number of GIST IDs is too ambiguous") -> None:
-        """Initiate the Exception class
+        """Initiate the Exception class.
 
         Parameters
         ----------
@@ -25,7 +27,6 @@ class GISTAmbiguityError(Exception):
         None.
 
         """
-
         # Set the instances; list of GIST IDs and message
         self.gist_ids_list = gist_ids_list
         self.message = message
@@ -33,9 +34,8 @@ class GISTAmbiguityError(Exception):
         # Super call itself to create message
         super().__init__(self.message)
 
-
     def __str__(self) -> str:
-        """Modifying the message function
+        """Modify the message function.
 
         Returns
         -------
@@ -43,13 +43,11 @@ class GISTAmbiguityError(Exception):
             Exception message.
 
         """
-
         return f'{self.message}\nIDs: ' + ', '.join(self.gist_ids_list)
 
 
 class GISTyc:
-    """This class is used to access the GitHub GIST REST API functions to create, update and delete
-    GISTs.
+    """Access the GitHub GIST REST API functions to create, update and delete GISTs.
 
     The advantage of this class and its corresponding methods is the capability to update
     e.g., already existing GISTs (with multiple files) that are e.g., embedded in an online
@@ -60,9 +58,8 @@ class GISTyc:
 
     """
 
-
     def __init__(self, auth_token: str) -> None:
-        """Initiate the GISTys class with the GitHub GIST REST API token
+        """Initiate the GISTys class with the GitHub GIST REST API token.
 
         Parameters
         ----------
@@ -74,19 +71,16 @@ class GISTyc:
         None.
 
         """
-
         # Set the authentication token
         self.auth_token = auth_token
 
         # Set the default header for the REST API
         self._headers = {'Authorization': f'token {auth_token}'}
 
-
     @staticmethod
     def _readnparse_python_file(file_name: t.Union[Path, str],
                                 sep: str = '#%%') -> t.Dict[t.Any, t.Any]:
-        """Helper function within the class to read a Python file and return a REST API - ready
-        body.
+        """Read a Python file and returns a REST API - ready body.
 
         Parameters
         ----------
@@ -101,7 +95,6 @@ class GISTyc:
             Body for the REST API call.
 
         """
-
         # Set the filename as a Path
         file_name = Path(file_name)
 
@@ -132,7 +125,7 @@ class GISTyc:
                 gist_code_dict[core_file_name.replace('.py', f'_{index}.py')] = {"content": k}
 
         # Put the content in a dictionary for the REST API
-        data = {"public" : True, "files" : gist_code_dict, }
+        data = {"public": True, "files": gist_code_dict, }
 
         return data
 
@@ -159,10 +152,8 @@ class GISTyc:
             file name correpsonding GIST ID (or input GIST ID).
 
         """
-
         if isinstance(gist_id, str):
             gist_id_ret = gist_id
-
 
         # If the gist id is empty, search for it based on the file name. Otherwise, return the
         # gist id
@@ -193,9 +184,8 @@ class GISTyc:
 
         return gist_id_ret
 
-
     def get_gists(self) -> t.List[t.Dict]:
-        """Get all GISTs information (ID, url, meta information, etc.)
+        """Get all GISTs information like e.g., ID, url, meta information, etc.
 
         Returns
         -------
@@ -203,7 +193,6 @@ class GISTyc:
             List of GISTs. Each GIST is a dictionary with miscellaneous data and meta data.
 
         """
-
         # Set the REST API url to obtain the list of GISTs. PAGE will be replace later in a loop.
         # Per page: a max. value of 100 GISTs is requested
         _query_url = "https://api.github.com/gists?page=PAGE&per_page=100"
@@ -233,10 +222,11 @@ class GISTyc:
 
         return resp_data
 
-
     def create_gist(self, file_name: t.Union[Path, str], sep: str = '#%%') -> t.List:
-        """Create a GISTs from a given file. Use "#%%" as a block separator to create sub-GISTs /
-        files from a single input file as default. Otherwise, please specify!
+        """Create a GISTs from a given file.
+
+        Use "#%%" as a block separator to create sub-GISTs / files from a single input file as
+        default. Otherwise, please specify!
 
         Parameters
         ----------
@@ -251,7 +241,6 @@ class GISTyc:
             GIST REST API response.
 
         """
-
         # Set the REST API url for creating a GIST
         _query_url = "https://api.github.com/gists"
 
@@ -264,11 +253,12 @@ class GISTyc:
 
         return resp_data
 
-
     def update_gist(self, file_name: t.Union[Path, str],
                     gist_id: t.Optional[str] = None) -> t.List:
-        """Update a GISTs based on its file name or GIST ID. If the file name is provided it is
-        assumed that only one GIST corresponds to the input's file name.
+        """Update a GISTs based on its file name or GIST ID.
+
+        If the file name is provided it is assumed that only one GIST corresponds to the input's
+        file name.
 
         Parameters
         ----------
@@ -284,7 +274,6 @@ class GISTyc:
             GIST REST API response.
 
         """
-
         # Convert the file name to pathlib.Path
         file_name = Path(file_name)
 
@@ -303,7 +292,6 @@ class GISTyc:
 
         return resp_data
 
-
     def delete_gist(self, file_name: t.Optional[t.Union[Path, str]] = None,
                     gist_id: t.Optional[str] = None) -> int:
         """Delete a GIST based on its GIST ID or file name. One input parameter MUST be provided.
@@ -321,7 +309,6 @@ class GISTyc:
             HTTP response code. A successful deletion shall return 204.
 
         """
-
         # If a file name is present, search for the GIST ID of the corresponding GIST
         if file_name:
             file_name = Path(file_name)

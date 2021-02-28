@@ -1,4 +1,4 @@
-"""CLI for the GISTyc routines"""
+"""CLI for the GISTyc routines."""
 
 # Import installed libraries
 import click
@@ -6,14 +6,13 @@ import click
 # Import GISTyc
 from . import GISTyc
 
+
 # Set click commands
 @click.command()
 @click.option('-C', '--create', is_flag=True, help='Flag: Create GIST')
 @click.option('-U', '--update', is_flag=True, help='Flag: Update GIST')
 @click.option('-D', '--delete', is_flag=True, help='Flag: Delete GIST')
-
 @click.option('-t', '--auth-token', help='GIST REST API token')
-
 @click.option('-f', '--file-name', help='Absolute or relative file name path')
 @click.option('-id', '--gist-id', default=None, help='GIST ID')
 def run(create: bool,
@@ -22,9 +21,9 @@ def run(create: bool,
         auth_token: str,
         file_name: str,
         gist_id: str) -> None:
-    """
-    CLI routine to call the GISTyc API to create, update and delete a GIST. Echos the response back
-    to the terminal.
+    """CLI routine to call the GISTyc API to create, update and delete a GIST.
+    
+    All public functions echo the response back to the terminal.
 
     Parameters
     ----------
@@ -46,7 +45,6 @@ def run(create: bool,
     None.
 
     """
-
     # Set the GISTys class
     gist_api = GISTyc(auth_token=auth_token)
 
@@ -69,7 +67,7 @@ def run(create: bool,
         # Else, use the GIST ID
         else:
             response_data = gist_api.update_gist(file_name=file_name, gist_id=gist_id)
-    
+
         # Echo the resposen back to the terminal
         click.echo(str(response_data))
 
