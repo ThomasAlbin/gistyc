@@ -16,18 +16,23 @@ from . import GISTyc
 
 @click.option('-f', '--file-name', help='Absolute or relative file name path')
 @click.option('-id', '--gist-id', default=None, help='GIST ID')
-def run(create, update, delete, auth_token, file_name, gist_id):
+def run(create: bool,
+        update: bool,
+        delete: bool,
+        auth_token: str,
+        file_name: str,
+        gist_id: str) -> None:
     """
     CLI routine to call the GISTyc API to create, update and delete a GIST. Echos the response back
     to the terminal.
 
     Parameters
     ----------
-    create : Bool
+    create : bool
         Flag to trigger the create routine.
-    update : Bool
+    update : bool
         Flag to trigger the update routine.
-    delete : Bool
+    delete : bool
         Flag to trigger the delete routine.
     auth_token : str
         GIST REST API token.
@@ -51,6 +56,9 @@ def run(create, update, delete, auth_token, file_name, gist_id):
         # Create a GIST with the sample file
         response_data = gist_api.create_gist(file_name=file_name)
 
+        # Echo the resposen back to the terminal
+        click.echo(str(response_data))
+
     # Update GIST routine
     elif update:
 
@@ -61,17 +69,20 @@ def run(create, update, delete, auth_token, file_name, gist_id):
         # Else, use the GIST ID
         else:
             response_data = gist_api.update_gist(file_name=file_name, gist_id=gist_id)
+    
+        # Echo the resposen back to the terminal
+        click.echo(str(response_data))
 
     # Delete GIST routine
     elif delete:
 
         # If not GIST ID is provided: use only the file name
         if not gist_id:
-            response_data = gist_api.delete_gist(file_name=file_name)
+            response_int = gist_api.delete_gist(file_name=file_name)
 
         # Else, use the GIST ID
         else:
-            response_data = gist_api.delete_gist(gist_id=gist_id)
+            response_int = gist_api.delete_gist(gist_id=gist_id)
 
-    # Echo the resposen back to the terminal
-    click.echo(str(response_data))
+        # Echo the resposen back to the terminal
+        click.echo(str(response_int))
