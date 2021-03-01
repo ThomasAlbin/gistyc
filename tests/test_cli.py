@@ -21,7 +21,7 @@ USAMPLE_FILE_NAME = 'sample.py'
 USAMPLE_FILE_PATH = os.path.join(CORE_PATH, '_resources/update', USAMPLE_FILE_NAME)
 
 # Get the GIST authentication token from the system environment
-AUTH_TOKEN = os.environ['gist_token']
+AUTH_TOKEN = os.environ['GIST_TOKEN']
 
 
 def test_cli_create_n_delete_id():
