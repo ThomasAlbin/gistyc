@@ -1,0 +1,14 @@
+# Communication
+requests
+
+# Testing
+pytest
+pydocstyle
+flake8
+mypy
+pyroma
+black
+bandit
+
+# CLI
+click
