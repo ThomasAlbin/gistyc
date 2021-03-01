@@ -9,3 +9,6 @@ mypy
 pyroma
 black
 bandit
+
+# CLI
+click
