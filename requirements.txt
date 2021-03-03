@@ -12,3 +12,6 @@ bandit
 
 # CLI
 click
+
+# Git Pre Commit
+pre-commit
