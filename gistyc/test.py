@@ -12,6 +12,8 @@ def test():
 
     s = "e23"
 
+    b = 5
+
     return 42
 
 
