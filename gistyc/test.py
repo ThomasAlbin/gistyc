@@ -8,7 +8,7 @@ a = 124
 # 3
 
 
-def test():
+def test(b=1):
 
     s = "e23"
 
