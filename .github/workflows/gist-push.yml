@@ -1,0 +1,8 @@
+name: GIST CD on main branch and example directory change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - examples/**
