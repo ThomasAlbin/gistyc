@@ -3,6 +3,7 @@
 # Import standard libraries
 import ast
 import os
+import pathlib
 import time
 
 # Import installed libraries
@@ -14,14 +15,17 @@ import gistyc
 # First, set the file name paths to the sample.py for creating and update the GISTs.
 CORE_PATH = os.path.dirname(os.path.abspath(__file__))
 
-CSAMPLE_FILE_NAME = 'sample.py'
-CSAMPLE_FILE_PATH = os.path.join(CORE_PATH, '_resources/create', CSAMPLE_FILE_NAME)
+CSAMPLE_FILE_NAME = "sample.py"
+CSAMPLE_FILE_PATH = os.path.join(CORE_PATH, "_resources/create", CSAMPLE_FILE_NAME)
 
-USAMPLE_FILE_NAME = 'sample.py'
-USAMPLE_FILE_PATH = os.path.join(CORE_PATH, '_resources/update', USAMPLE_FILE_NAME)
+USAMPLE_FILE_NAME = "sample.py"
+USAMPLE_FILE_PATH = os.path.join(CORE_PATH, "_resources/update", USAMPLE_FILE_NAME)
+
+CDIR = os.path.join(CORE_PATH, "_resources/create_dir")
+UDIR = os.path.join(CORE_PATH, "_resources/update_dir")
 
 # Get the GIST authentication token from the system environment
-AUTH_TOKEN = os.environ['GIST_TOKEN']
+AUTH_TOKEN = os.environ["GIST_TOKEN"]
 
 
 def test_cli_create_n_delete_id():
@@ -35,9 +39,9 @@ def test_cli_create_n_delete_id():
 
     # Set up the CLI Runner and execute the create command
     runner = CliRunner()
-    cresult = runner.invoke(gistyc.cli.run, ['--create',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--file-name', CSAMPLE_FILE_PATH])
+    cresult = runner.invoke(
+        gistyc.cli.run, ["--create", "--auth-token", AUTH_TOKEN, "--file-name", CSAMPLE_FILE_PATH]
+    )
 
     # Check if the CLI ran error free
     assert cresult.exit_code == 0
@@ -46,19 +50,19 @@ def test_cli_create_n_delete_id():
     cresult_data = ast.literal_eval(cresult.output)
 
     # Check if the file name is in the GIST REST API response
-    assert CSAMPLE_FILE_NAME in cresult_data['files'].keys()
+    assert CSAMPLE_FILE_NAME in cresult_data["files"].keys()
 
     # Set up the CLI Runner and execute the delete command
     runner = CliRunner()
-    dresult = runner.invoke(gistyc.cli.run, ['--delete',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--gist-id', cresult_data['id']])
+    dresult = runner.invoke(
+        gistyc.cli.run, ["--delete", "--auth-token", AUTH_TOKEN, "--gist-id", cresult_data["id"]]
+    )
 
     # Check if the CLI ran error free
     assert dresult.exit_code == 0
 
     # Check the HTTP status code
-    assert '204' in dresult.output
+    assert "204" in dresult.output
 
 
 def test_cli_create_n_delete():
@@ -72,9 +76,9 @@ def test_cli_create_n_delete():
 
     # Set up the CLI Runner and execute the create command
     runner = CliRunner()
-    cresult = runner.invoke(gistyc.cli.run, ['--create',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--file-name', CSAMPLE_FILE_PATH])
+    cresult = runner.invoke(
+        gistyc.cli.run, ["--create", "--auth-token", AUTH_TOKEN, "--file-name", CSAMPLE_FILE_PATH]
+    )
 
     # Check if the CLI ran error free
     assert cresult.exit_code == 0
@@ -83,19 +87,19 @@ def test_cli_create_n_delete():
     cresult_data = ast.literal_eval(cresult.output)
 
     # Check if the file name is in the GIST REST API response
-    assert CSAMPLE_FILE_NAME in cresult_data['files'].keys()
+    assert CSAMPLE_FILE_NAME in cresult_data["files"].keys()
 
     # Set up the CLI Runner and execute the delete command
     runner = CliRunner()
-    dresult = runner.invoke(gistyc.cli.run, ['--delete',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--file-name', CSAMPLE_FILE_PATH])
+    dresult = runner.invoke(
+        gistyc.cli.run, ["--delete", "--auth-token", AUTH_TOKEN, "--file-name", CSAMPLE_FILE_PATH]
+    )
 
     # Check if the CLI ran error free
     assert dresult.exit_code == 0
 
     # Check the HTTP status code
-    assert '204' in dresult.output
+    assert "204" in dresult.output
 
 
 def test_cli_create_n_update_file():
@@ -109,9 +113,9 @@ def test_cli_create_n_update_file():
 
     # Set up the CLI Runner and execute the create command
     runner = CliRunner()
-    cresult = runner.invoke(gistyc.cli.run, ['--create',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--file-name', CSAMPLE_FILE_PATH])
+    cresult = runner.invoke(
+        gistyc.cli.run, ["--create", "--auth-token", AUTH_TOKEN, "--file-name", CSAMPLE_FILE_PATH]
+    )
 
     # Check if the CLI ran error free
     assert cresult.exit_code == 0
@@ -120,16 +124,16 @@ def test_cli_create_n_update_file():
     cresult_data = ast.literal_eval(cresult.output)
 
     # Check if the file name is in the GIST REST API response
-    assert CSAMPLE_FILE_NAME in cresult_data['files'].keys()
+    assert CSAMPLE_FILE_NAME in cresult_data["files"].keys()
 
     # Wait for a second, to clearly set a difference between the creation and update datetime
     time.sleep(1)
 
     # Set up the CLI Runner and execute the update command
     runner = CliRunner()
-    uresult = runner.invoke(gistyc.cli.run, ['--update',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--file-name', USAMPLE_FILE_PATH])
+    uresult = runner.invoke(
+        gistyc.cli.run, ["--update", "--auth-token", AUTH_TOKEN, "--file-name", USAMPLE_FILE_PATH]
+    )
 
     # Check if the CLI ran error free
     assert uresult.exit_code == 0
@@ -138,17 +142,18 @@ def test_cli_create_n_update_file():
     uresult_data = ast.literal_eval(uresult.output)
 
     # Check if the create date time is older than the update datetime
-    assert uresult_data['updated_at'] > uresult_data['created_at']
+    assert uresult_data["updated_at"] > uresult_data["created_at"]
 
     # Set up the CLI Runner and execute the delete command
-    dresult = runner.invoke(gistyc.cli.run, ['--delete',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--gist-id', uresult_data['id']])
+    dresult = runner.invoke(
+        gistyc.cli.run, ["--delete", "--auth-token", AUTH_TOKEN, "--gist-id", uresult_data["id"]]
+    )
     # Check if the CLI ran error free
     assert dresult.exit_code == 0
 
     # Check the HTTP status code
-    assert '204' in dresult.output
+    assert "204" in dresult.output
+
 
 def test_cli_create_n_update_id():
     """Testing the creation and update of a GIST (based on the GIST ID).
@@ -161,9 +166,9 @@ def test_cli_create_n_update_id():
 
     # Set up the CLI Runner and execute the create command
     runner = CliRunner()
-    cresult = runner.invoke(gistyc.cli.run, ['--create',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--file-name', CSAMPLE_FILE_PATH])
+    cresult = runner.invoke(
+        gistyc.cli.run, ["--create", "--auth-token", AUTH_TOKEN, "--file-name", CSAMPLE_FILE_PATH]
+    )
     # Check if the CLI ran error free
     assert cresult.exit_code == 0
 
@@ -171,17 +176,25 @@ def test_cli_create_n_update_id():
     cresult_data = ast.literal_eval(cresult.output)
 
     # Check if the file name is in the GIST REST API response
-    assert CSAMPLE_FILE_NAME in cresult_data['files'].keys()
+    assert CSAMPLE_FILE_NAME in cresult_data["files"].keys()
 
     # Wait for a second, to clearly set a difference between the creation and update datetime
     time.sleep(1)
 
     # Set up the CLI Runner and execute the update command
     runner = CliRunner()
-    uresult = runner.invoke(gistyc.cli.run, ['--update',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--file-name', USAMPLE_FILE_PATH,
-                                             '--gist-id', cresult_data['id']])
+    uresult = runner.invoke(
+        gistyc.cli.run,
+        [
+            "--update",
+            "--auth-token",
+            AUTH_TOKEN,
+            "--file-name",
+            USAMPLE_FILE_PATH,
+            "--gist-id",
+            cresult_data["id"],
+        ],
+    )
 
     # Check if the CLI ran error free
     assert uresult.exit_code == 0
@@ -190,14 +203,49 @@ def test_cli_create_n_update_id():
     uresult_data = ast.literal_eval(uresult.output)
 
     # Check if the create date time is older than the update datetime
-    assert uresult_data['updated_at'] > uresult_data['created_at']
+    assert uresult_data["updated_at"] > uresult_data["created_at"]
 
     # Set up the CLI Runner and execute the delete command
-    dresult = runner.invoke(gistyc.cli.run, ['--delete',
-                                             '--auth-token', AUTH_TOKEN,
-                                             '--gist-id', uresult_data['id']])
+    dresult = runner.invoke(
+        gistyc.cli.run, ["--delete", "--auth-token", AUTH_TOKEN, "--gist-id", uresult_data["id"]]
+    )
     # Check if the CLI ran error free
     assert dresult.exit_code == 0
 
     # Check the HTTP status code
-    assert '204' in dresult.output
+    assert "204" in dresult.output
+
+
+def test_cli_dir_run():
+    """Testing the creation and update of a GIST based on a given directory.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    # Set up the CLI Runner and execute the command
+    runner = CliRunner()
+    _ = runner.invoke(gistyc.cli.dir_run, ["--directory", CDIR, "--auth-token", AUTH_TOKEN])
+
+    # Sleep a second
+    time.sleep(1)
+
+    # Execute the command with the update directory
+    _ = runner.invoke(gistyc.cli.dir_run, ["--directory", UDIR, "--auth-token", AUTH_TOKEN])
+
+    # Sleep a second
+    time.sleep(1)
+
+    # Now we need to clean up the GISTs (deleting everything)
+    # Iterate through all directory Python files
+    for python_filepath in pathlib.Path(UDIR).rglob("*.py"):
+
+        # Get the filename
+        python_filename = python_filepath.name
+
+        # Execute the single file CLI command to delete the GIST
+        runner.invoke(
+            gistyc.cli.run, ["--delete", "--auth-token", AUTH_TOKEN, "--file-name", python_filename]
+        )
