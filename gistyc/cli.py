@@ -1,5 +1,9 @@
 """CLI for the GISTyc routines."""
 
+# Import standard libraries
+import pathlib
+import typing as t
+
 # Import installed libraries
 import click
 
@@ -81,3 +85,59 @@ def run(
 
         # Echo the resposen back to the terminal
         click.echo(str(response_int))
+
+
+# A second CLI tool to parse directories
+@click.command()
+@click.option("-t", "--auth-token", help="GIST REST API token")
+@click.option("-d", "--directory", help="Directory that contains Python scripts")
+def dir_run(auth_token: str, directory: t.Union[pathlib.Path, str]) -> None:
+    """CLI routine to create / update GitHub gists based on a given directory.
+
+    This CLI routine takes a directory as an input and iterates recursively through it to determine
+    all Python files. These files are then either created as a GIST or updated (if already
+    present). Please note that GISTs must be unambiguous with respect to their file name. The
+    update routine considers only the file name, since the directory input provides only a list
+    of corresponding files.
+
+    Parameters
+    ----------
+    auth_token : str
+        GIST REST API token.
+    directory : t.Union[pathlib.Path, str]
+        Direcotry containing Python files.
+
+    Returns
+    -------
+    None.
+
+    """
+    # Set the GISTys class
+    gist_api = GISTyc(auth_token=auth_token)
+
+    # Set the directory as a pathlib Path
+    dir_path = pathlib.Path(directory)
+
+    # Get a list of all gists
+    gists = gist_api.get_gists()
+
+    # Create a list of all file names (since gists may contain more than 1 file one needs to
+    # flatten the list)
+    gist_files_dictfiles = [list(gist_item["files"].keys()) for gist_item in gists]
+    gist_files = [x for x in gist_files_dictfiles for x in x]
+
+    # Create or update the GIST based on the Python file names within the given directory
+    # Iterate through all Python files that are being found recursively within the directory.
+    for python_filepath in dir_path.rglob("*.py"):
+
+        # Get the filename
+        python_filename = python_filepath.name
+
+        # If the file name exists in the GIST list, update it, otherwise create one
+        if python_filename in gist_files:
+            _ = gist_api.update_gist(file_name=python_filepath)
+        else:
+            _ = gist_api.create_gist(file_name=python_filepath)
+
+    # Return a simple echo string
+    click.echo("DONE")
