@@ -18,6 +18,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install gistyc
-      - run: pip install gistyc
+       run: pip install gistyc
     - name: Use gistyc CLI on examples/**
-      - run: gistyc_dir --auth-token ${{ secrets.GIST_TOKEN }} --directory examples/
+       run: gistyc_dir --auth-token ${{ secrets.GIST_TOKEN }} --directory examples/
