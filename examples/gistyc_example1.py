@@ -1,4 +1,4 @@
-"""A sample example for gistyc"""
+"""A sample example for the gistyc CLI v1"""
 
 # Import module
 import time
