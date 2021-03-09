@@ -185,9 +185,9 @@ Example Python files (in a directory) can be found [here](https://github.com/Tho
 
 The corresponding GISTs are embedded hereinafter:
 
-<script src="https://gist.github.com/ThomasAlbin/b18383a86cb4396a79a551a73330ce76.js"></script>
+<script src="https://gist.github.com/ThomasAlbin/b18383a86cb4396a79a551a73330ce76.js">{newline}</script>
 
-<script src="https://gist.github.com/ThomasAlbin/caddb300ac663e60ae573b1117599fcc.js"></script>
+<script src="https://gist.github.com/ThomasAlbin/caddb300ac663e60ae573b1117599fcc.js">{newline}</script>
 
 ---
 
