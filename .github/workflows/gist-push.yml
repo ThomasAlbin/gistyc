@@ -1,17 +1,33 @@
+# CI/CD GitHub Action YAML file
+#
+# This YAML file executes a gistyc create / update pipeline on all Python files
+# within the folder ./examples (after merging to the main branch)
 name: GIST CD on main branch and example directory change
 
+# Check if files have been pushed to ./examples
 on:
   push:
     paths:
       - examples/**
 
+# Execute the gistyc create / update pipeline
 jobs:
+
   build:
+
+    # Execute the pipeline only on changes on the main branche
     if: github.ref == 'refs/heads/main'
+
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python-version: ['3.8']
+
+    # Steps:
+    # - Checkout the branch & use Python
+    # - Install gistyc
+    # - Use gistyc_dir, authenticate and use the ./examples directory as an input
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
