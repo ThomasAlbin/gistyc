@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/example_folder_cd'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     strategy:
       matrix:
