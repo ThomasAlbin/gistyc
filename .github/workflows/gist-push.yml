@@ -1,0 +1,24 @@
+name: GIST CD on main branch and example directory change
+
+on:
+  push:
+    paths:
+      - examples/**
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install gistyc
+      run: pip install gistyc
+    - name: Use gistyc CLI on examples/**
+      run: gistyc_dir --auth-token ${{ secrets.GIST_TOKEN }} --directory ./examples/
