@@ -184,11 +184,65 @@ gistyc_dir --auth-token AUTH_TOKEN --directory DIRECTORY
 Example Python files (in a directory) can be found [here](https://github.com/ThomasAlbin/gistyc/tree/main/examples).
 
 The corresponding GISTs are embedded hereinafter:
-
-<script src="https://gist.github.com/ThomasAlbin/b18383a86cb4396a79a551a73330ce76.js">{newline}</script>
-
-<script src="https://gist.github.com/ThomasAlbin/caddb300ac663e60ae573b1117599fcc.js">{newline}</script>
+https://gist.github.com/ThomasAlbin/b18383a86cb4396a79a551a73330ce76
+https://gist.github.com/ThomasAlbin/caddb300ac663e60ae573b1117599fcc.
 
 ---
 
 ## GitHub Actions - CI/CD
+
+The following YAML file is used by the gistyc repository to provide an example on how to use gistyc in a CI/CD pipeline. Example Python scripts are stored, added and edited in ./examples. Changes in this directory trigger the pipeline (only after a merge with the main branch).
+
+```YAML
+# CI/CD GitHub Action YAML file
+#
+# This YAML file executes a gistyc create / update pipeline on all Python files
+# within the folder ./examples (after merging to the main branch)
+name: GIST CD on main branch and example directory change
+
+# Check if files have been pushed to ./examples
+on:
+  push:
+    paths:
+      - examples/**
+
+# Execute the gistyc create / update pipeline
+jobs:
+
+  build:
+
+    # Execute the pipeline only on changes on the main branche
+    if: github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.8']
+
+    # Steps:
+    # - Checkout the branch & use Python
+    # - Install gistyc
+    # - Use gistyc_dir, authenticate and use the ./examples directory as an input
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install gistyc
+      run: pip install gistyc
+    - name: Use gistyc CLI on examples/**
+      run: gistyc_dir --auth-token ${{ secrets.GIST_TOKEN }} --directory ./examples/
+```
+
+---
+
+## Support & Contributions
+
+ If you have requests, issues or ideas please use the GitHub Issues. Contributions are always welcome and should be provided via a Pull Request. Please note the strict coding standards and other guidelines. These standards are checked for all PRs and can be seen [here](https://github.com/ThomasAlbin/gistyc/blob/main/.github/workflows/python-package.yml). Please note that all functions must contain a pytest.
+
+Direct messages to the author of gistyc are always welcome. Please use [Twitter](https://twitter.com/MrAstroThomas), [Reddit](https://www.reddit.com/user/MrAstroThomas) or [Medium](https://thomas-albin.medium.com/) for this purpose.
+
+Best,<br>
+Thomas
