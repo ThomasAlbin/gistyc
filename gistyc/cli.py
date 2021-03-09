@@ -130,13 +130,18 @@ def dir_run(auth_token: str, directory: t.Union[pathlib.Path, str]) -> None:
     # Iterate through all Python files that are being found recursively within the directory.
     for python_filepath in dir_path.rglob("*.py"):
 
+        # Echo the currently fetched file
+        click.echo(python_filepath)
+
         # Get the filename
         python_filename = python_filepath.name
 
         # If the file name exists in the GIST list, update it, otherwise create one
         if python_filename in gist_files:
+            click.echo("UPDATE")
             _ = gist_api.update_gist(file_name=python_filepath)
         else:
+            click.echo("CREATE")
             _ = gist_api.create_gist(file_name=python_filepath)
 
     # Return a simple echo string
