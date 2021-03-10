@@ -14,7 +14,7 @@ gistyc is a Python-based library that enables developers to create, update and d
   - Click <b>Settings</b>
   - On the left menu bar go to <b>Developer settings</b> and choose <b>Personal access tokens</b>
   - <b>Generate new token</b> and write a name (note) of your token. The note does not affect the functionality, but choose a note that describes the purpose of the token e.g., <i>GIST_token</i>
-  - Set a mark a <b>gist</b> (<i>Create gists</i>) and click on <b>Generate token</b> at the bottom of the page
+  - Set a mark at <b>gist</b> (<i>Create gists</i>) and click on <b>Generate token</b> at the bottom of the page
   - IMPORTANT: The displayed token appears only once. Copy it and store it in your GitHub project as a secret and / or locally as an environment variable.
 
 ---
@@ -24,7 +24,7 @@ gistyc is a Python-based library that enables developers to create, update and d
 pip install gistyc
 ```
 
-... or install it from the main branch or this [repository](https://github.com/ThomasAlbin/gistyc). You can also download the entire repository to run the tests, download the CI/CD scripts etc.
+... or install it from the main branch of this [repository](https://github.com/ThomasAlbin/gistyc). You can also download the entire repository to run the tests, download the CI/CD scripts etc.
 
 ---
 
@@ -33,7 +33,7 @@ pip install gistyc
 <i>Please note: ./tests provides some examples that can be reproduced / applied.<br>
 We assume:
 - AUTH_TOKEN: is the GIST access token
-- FILEPATH: is the absolute or relative path to a Python file
+- FILEPATH: is the absolute or relative path of a Python file
 - GIST_ID: ID of a GIST.</i>
 
 ### Create a GIST
@@ -53,7 +53,7 @@ response_data = gist_api.create_gist(file_name=FILEPATH)
 
 Updating a GIST requires either ONLY the FILEPATH or the FILEPATH AND a corresponding GIST ID, if the GIST repository contains file names that occur more than once. Hint: keep your GIST repository clean from same-name files!
 
-Updating using ONLY the FILEPATH:
+Update using ONLY the FILEPATH:
 
 ```python
 # import
@@ -66,7 +66,7 @@ gist_api = gistyc.GISTyc(auth_token=AUTH_TOKEN)
 response_update_data = gist_api.update_gist(file_name=FILEPATH)
 ```
 
-Updating using the FILEPATH AND GIST ID:
+Update using the FILEPATH AND GIST ID:
 
 ```python
 # import
@@ -97,7 +97,7 @@ gist_list = gist_api.get_gists()
 
 ## Delete a GIST
 
-Deleting using ONLY the FILEPATH
+Deletion using ONLY the FILEPATH
 
 ```python
 # import
@@ -110,7 +110,7 @@ gist_api = gistyc.GISTyc(auth_token=AUTH_TOKEN)
 response_data = gist_api.delete_gist(file_name=FILEPATH)
 ```
 
-Deleting using ONLY the GIST ID
+Deletion using ONLY the GIST ID
 
 ```python
 # import
@@ -131,7 +131,7 @@ response_data = gist_api.delete_gist(gist_id=GIST_ID)
 <i>Please note: ./tests provides some examples that can be reproduced / applied.<br>
 We assume:
 - AUTH_TOKEN: is the GIST access token
-- FILEPATH: is the absolute or relative path to a Python file
+- FILEPATH: is the absolute or relative path of a Python file
 - GIST_ID: ID of a GIST
 - DIRECTORY: A directory (with an arbitrary number of sub-directories) that contains Python files</i>
 
@@ -143,13 +143,13 @@ gistyc --create --auth-token AUTH_TOKEN --file-name FILEPATH
 
 ### Update a GIST
 
-Updating using ONLY the FILEPATH:
+Update using ONLY the FILEPATH:
 
 ```bash
 gistyc --update --auth-token AUTH_TOKEN --file-name FILEPATH
 ```
 
-Updating using the FILEPATH AND GIST ID:
+Update using the FILEPATH AND GIST ID:
 
 ```bash
 gistyc --update --auth-token AUTH_TOKEN --file-name FILEPATH --gist-id GIST_ID
@@ -157,13 +157,13 @@ gistyc --update --auth-token AUTH_TOKEN --file-name FILEPATH --gist-id GIST_ID
 
 ### Delete a GIST
 
-Deleting using ONLY the FILEPATH
+Deletion using ONLY the FILEPATH
 
 ```bash
 gistyc --delete --auth-token AUTH_TOKEN --file-name FILEPATH
 ```
 
-Deleting using ONLY the GIST ID
+Deletion using ONLY the GIST ID
 
 ```bash
 gistyc --delete --auth-token AUTH_TOKEN --gist-id GIST_ID
