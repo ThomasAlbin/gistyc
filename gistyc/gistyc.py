@@ -80,7 +80,7 @@ class GISTyc:
 
     @staticmethod
     def _readnparse_python_file(
-        file_name: t.Union[Path, str], sep: str = "#%%"
+        file_name: t.Union[Path, str], sep: str = "#%%", public: bool = True
     ) -> t.Dict[t.Any, t.Any]:
         """Read a Python file and returns a REST API - ready body.
 
@@ -128,7 +128,7 @@ class GISTyc:
 
         # Put the content in a dictionary for the REST API
         data = {
-            "public": True,
+            "public": public,
             "files": gist_code_dict,
         }
 
@@ -228,7 +228,7 @@ class GISTyc:
 
         return resp_data
 
-    def create_gist(self, file_name: t.Union[Path, str], sep: str = "#%%") -> t.List:
+    def create_gist(self, file_name: t.Union[Path, str], sep: str = "#%%", public: bool = True) -> t.List:
         """Create a GISTs from a given file.
 
         Use "#%%" as a block separator to create sub-GISTs / files from a single input file as
@@ -251,7 +251,7 @@ class GISTyc:
         _query_url = "https://api.github.com/gists"
 
         # Read the file and return the body for the REST API call
-        rest_api_data = self._readnparse_python_file(file_name, sep=sep)
+        rest_api_data = self._readnparse_python_file(file_name, sep=sep, public=public)
 
         # Call the REST API and obtain the response
         resp = requests.post(_query_url, headers=self._headers, data=json.dumps(rest_api_data))
