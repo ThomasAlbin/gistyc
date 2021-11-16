@@ -211,7 +211,7 @@ jobs:
 
   build:
 
-    # Execute the pipeline only on changes on the main branche
+    # Execute the pipeline only on changes on the main branch
     if: github.ref == 'refs/heads/main'
 
     runs-on: ubuntu-latest
